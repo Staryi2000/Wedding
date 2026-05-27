@@ -16,6 +16,12 @@
             padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent; /* Убирает темную вспышку при тапе на смартфонах */
+        }
+
+        /* УБИРАЕМ КРИВУЮ ГОЛУБУЮ ОБВОДКУ ПРИ КЛИКАХ НА ВСЕ ЭЛЕМЕНТЫ */
+        *:focus {
+            outline: none !important;
         }
 
         body {
@@ -38,7 +44,6 @@
             overflow: hidden;
         }
 
-        /* Бордовое облако сверху слева */
         .blur-wine {
             position: absolute;
             width: 450px;
@@ -53,7 +58,6 @@
             transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); 
         }
 
-        /* Небесно-голубое облако снизу справа */
         .blur-blue {
             position: absolute;
             width: 500px;
@@ -79,7 +83,7 @@
             z-index: 1;
         }
 
-        /* БАЗОВЫЕ СТИЛИ ДЛЯ АНИМАЦИИ В ОБЕ СТОРОНЫ */
+        /* БАЗОВЫЕ СТИЛИ ДЛЯ АНИМАЦИИ */
         .card, .anim-fade-up {
             opacity: 0;
             transform: translateY(30px) scale(0.98);
@@ -87,13 +91,11 @@
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
         }
 
-        /* Класс видимости включает анимацию плавно и без скачков */
         .is-visible {
             opacity: 1 !important;
             transform: translateY(0) scale(1) !important;
         }
 
-        /* СТИЛИЗАЦИЯ КАРТОЧЕК И ТЕКСТА */
         .card {
             background: #ffffff;
             border: 1px solid rgba(0, 0, 0, 0.04);
@@ -135,14 +137,31 @@
             margin-top: 12px;
         }
 
-        /* ФОТО ЗАГСА И КАРТЫ */
+        /* МИГАЮЩИЙ СКЕЛЕТОН ДЛЯ ПЛАВНОЙ ЗАГРУЗКИ КАРТИНКИ ЗАГСа */
         .image-container {
             width: 100%;
             height: 210px;
             border-radius: 16px;
             margin: 18px 0;
             overflow: hidden;
-            background: #e2e8f0;
+            position: relative;
+            background-color: #e2e8f0;
+        }
+
+        /* Эффект пульсации */
+        .image-container.loading::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, #e2e8f0 25%, #edf2f7 50%, #e2e8f0 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            z-index: 2;
+        }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
 
         .location-img {
@@ -150,6 +169,12 @@
             height: 100%;
             object-fit: cover;
             display: block;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out; /* Картинка проявится плавно */
+        }
+
+        .location-img.loaded {
+            opacity: 1;
         }
 
         .map-preview-block {
@@ -265,7 +290,6 @@
             border: 1px solid rgba(0,0,0,0.1);
             background: #fff;
             font-size: 0.95rem;
-            outline: none;
             color: #1d1d1f;
             transition: border-color 0.2s ease;
             -webkit-appearance: none;
@@ -363,8 +387,8 @@
         <h1>Где и когда</h1>
         <p>Ждем вас <strong>16 сентября 2026 года в 13:30</strong> на сбор гостей и торжественную церемонию.</p>
         
-        <div class="image-container anim-fade-up js-observer-target">
-            <img src="./11747.jpeg" alt="Дворец бракосочетания Домодедово" class="location-img">
+        <div class="image-container loading anim-fade-up js-observer-target" id="imgWrapper">
+            <img src="./11747.jpeg" alt="Дворец бракосочетания Домодедово" class="location-img" id="weddingImg">
         </div>
         
         <p style="font-weight: 600; margin-bottom: 2px;">Локация:</p>
@@ -444,6 +468,21 @@
 </div>
 
 <script>
+    // Управление умной загрузкой фото ЗАГСа
+    const weddingImg = document.getElementById('weddingImg');
+    const imgWrapper = document.getElementById('imgWrapper');
+
+    function handleImageLoaded() {
+        imgWrapper.classList.remove('loading');
+        weddingImg.classList.add('loaded');
+    }
+
+    if (weddingImg.complete) {
+        handleImageLoaded();
+    } else {
+        weddingImg.addEventListener('load', handleImageLoaded);
+    }
+
     // 1. ПАРАЛЛАКС ФОНА
     const blurWine = document.getElementById('blurWine');
     const blurBlue = document.getElementById('blurBlue');
@@ -456,7 +495,6 @@
 
     // 2. INTERSECTION OBSERVER БЕЗ ДРЕБЕЗГА
     const observerTargets = document.querySelectorAll('.js-observer-target');
-    
     const observerOptions = {
         root: null,
         rootMargin: '25px 0px 25px 0px', 
