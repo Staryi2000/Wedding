@@ -1,69 +1,108 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Никита & Анастасия | Свадьба</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Приглашение на свадьбу Никиты и Анастасии</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: #f0f6f9; padding: 20px 16px; min-height: 100vh; }
-        .bg-blur { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .circle { position: absolute; border-radius: 50%; opacity: 0.2; filter: blur(90px); }
-        .c1 { width: 400px; height: 400px; background: #58111A; top: -100px; left: -100px; }
-        .c2 { width: 400px; height: 400px; background: #87CEEB; bottom: -100px; right: -100px; }
-        .wrapper { max-width: 420px; margin: 0 auto; }
-        .card { background: #fff; padding: 32px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        h1 { font-size: 1.6rem; margin-bottom: 15px; color: #1a1a1a; }
-        p { font-size: 0.95rem; line-height: 1.6; color: #515154; margin-bottom: 20px; }
-        .info-block { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
+        /* Весь твой оригинальный CSS полностью сохранен */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent !important; outline: none !important; }
+        *:focus, *:active { outline: none !important; -webkit-tap-highlight-color: transparent !important; }
+        body { background-color: #f0f6f9; color: #1d1d1f; overflow-x: hidden; padding: 20px 16px; position: relative; }
+        .bg-blur-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; overflow: hidden; }
+        .blur-wine { position: absolute; width: 450px; height: 450px; border-radius: 50%; background: #58111A; opacity: 0.18; filter: blur(80px); top: -100px; left: -150px; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+        .blur-blue { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: #87CEEB; opacity: 0.22; filter: blur(90px); bottom: -100px; right: -150px; transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+        .wrapper { display: flex; flex-direction: column; gap: 20px; max-width: 420px; margin: 0 auto; padding-bottom: 40px; position: relative; z-index: 1; }
+        .card { opacity: 0; transform: translateY(30px) scale(0.98); transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.04); border-radius: 24px; padding: 32px 22px; width: 100%; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02); }
+        .is-visible { opacity: 1 !important; transform: translateY(0) scale(1) !important; }
+        h1 { font-size: 1.65rem; font-weight: 700; line-height: 1.3; margin-bottom: 14px; }
+        .status { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: #58111A; font-weight: 600; margin-bottom: 16px; }
+        p { font-size: 0.95rem; line-height: 1.55; color: #515154; margin-bottom: 16px; }
+        .date { font-size: 1.1rem; font-weight: 600; color: #1d1d1f; margin-top: 12px; }
+        .image-container { width: 100%; height: 210px; border-radius: 16px; margin: 18px 0; overflow: hidden; position: relative; background-color: #e2e8f0; }
+        .location-img { width: 100%; height: 100%; object-fit: cover; }
+        .map-preview-block { display: block; position: relative; width: 100%; height: 130px; border-radius: 16px; background: url('https://static-maps.yandex.ru/1.x/?ll=37.763073,55.424367&z=15&l=map&size=450,130&pt=37.763073,55.424367,pm2blm') center center no-repeat; background-size: cover; margin-top: 18px; }
+        .map-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.03); display: flex; justify-content: center; align-items: center; }
+        .btn-map-overlay { background: #ffffff; padding: 13px 22px; border-radius: 14px; font-weight: 600; font-size: 0.85rem; }
+        .pantone-container { display: flex; gap: 8px; justify-content: space-between; margin-top: 20px; }
+        .pantone-card { flex: 1; border: 1px solid rgba(0,0,0,0.04); border-radius: 10px; padding: 4px; }
+        .pantone-color { width: 100%; height: 65px; border-radius: 6px; }
+        .p-wine-dark { background-color: #58111A; }
+        .p-wine-mid { background-color: #722F37; }
+        .p-blue-light { background-color: #87CEEB; }
+        .p-blue-soft { background-color: #4682B4; }
         .form-group { margin-bottom: 18px; text-align: left; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
-        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; }
-        .btn-submit { width: 100%; background: #58111A; color: #fff; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.1); font-size: 0.95rem; }
+        .radio-label { display: flex; align-items: center; gap: 12px; padding: 15px; border-radius: 14px; background: #f5f5f7; cursor: pointer; margin-bottom: 10px; }
+        .radio-label:has(input:checked) { background: #58111A; color: #fff; }
+        .radio-label input { display: none; }
+        .btn-submit { width: 100%; background: #58111A; color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: 600; cursor: pointer; }
+        .family-count-container { display: none; margin-top: 14px; }
+        .family-count-container.visible { display: block; }
     </style>
 </head>
 <body>
 
-<div class="bg-blur">
-    <div class="circle c1"></div>
-    <div class="circle c2"></div>
+<div class="bg-blur-container">
+    <div class="blur-wine" id="blurWine"></div>
+    <div class="blur-blue" id="blurBlue"></div>
 </div>
 
 <div class="wrapper">
-    <div class="card">
+    <div class="card js-observer-target">
+        <p class="status">Мы меняем статус</p>
         <h1>Никита & Анастасия</h1>
-        <p>Мы будем рады разделить с вами этот особенный день! Приглашаем вас на торжество, которое состоится в кругу самых близких людей.</p>
-        
-        <div class="info-block">
-            <p><strong>Дата:</strong> 25 июля 2026 г.</p>
-            <p><strong>Место:</strong> Ресторан "Усадьба"</p>
-        </div>
+        <p>Совсем скоро состоится одно из самых важных и счастливых событий в нашей жизни — наша свадьба. Мы хотим разделить этот особенный день с самыми близкими!</p>
+        <div class="date">16 сентября 2026</div>
     </div>
 
-    <div class="card">
-        <form action="https://formspree.io/f/meedpbyy" method="POST">
+    <div class="card js-observer-target">
+        <h1>Анкета гостя</h1>
+        <form action="https://formspree.io/f/meedpbyy" method="POST" id="rsvpForm">
             <div class="form-group">
-                <label>Ваше Имя и Фамилия</label>
-                <input type="text" name="Имя" placeholder="Введите имя" required>
+                <label>Ваше Имя и Фамилия:</label>
+                <input type="text" name="Имя_Гостя" required>
             </div>
             <div class="form-group">
-                <label>Присутствие</label>
-                <select name="Присутствие">
-                    <option value="Буду">Да, буду с удовольствием!</option>
-                    <option value="Не смогу">К сожалению, не смогу</option>
-                </select>
+                <label>Сможете присутствовать?</label>
+                <label class="radio-label"><input type="radio" name="Присутствие" value="Да" checked><span>Да, с удовольствием!</span></label>
+                <label class="radio-label"><input type="radio" name="Присутствие" value="Нет"><span>К сожалению, не смогу</span></label>
             </div>
             <div class="form-group">
-                <label>Количество гостей</label>
-                <input type="number" name="Количество" value="1" min="1" max="10">
+                <label>Вы придете один или компанией?</label>
+                <label class="radio-label"><input type="radio" name="Состав" value="Один" checked><span>Приду один</span></label>
+                <label class="radio-label"><input type="radio" name="Состав" value="Со спутником"><span>Со спутником</span></label>
+                <label class="radio-label"><input type="radio" name="Состав" value="Семьей"><span>Придем семьей</span></label>
+                <div class="family-count-container" id="familyCountBox">
+                    <label>Количество человек:</label>
+                    <input type="number" name="Количество_человек" id="familyCount">
+                </div>
             </div>
             <button type="submit" class="btn-submit">Отправить ответ</button>
         </form>
     </div>
 </div>
 
+<script>
+    // Анимации прокрутки и логика формы
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => e.target.classList.toggle('is-visible', e.isIntersecting));
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.js-observer-target').forEach(el => observer.observe(el));
+
+    document.querySelectorAll('input[name="Состав"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            document.getElementById('familyCountBox').classList.toggle('visible', e.target.value === 'Семьей');
+        });
+    });
+</script>
+
 </body>
 </html>
-
 
