@@ -7,18 +7,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: #f0f6f9; padding: 20px; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        body { background-color: #f0f6f9; padding: 20px 16px; min-height: 100vh; }
         .bg-blur { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .circle { position: absolute; border-radius: 50%; opacity: 0.4; filter: blur(80px); }
-        .c1 { width: 300px; height: 300px; background: #58111A; top: -50px; left: -50px; }
-        .c2 { width: 300px; height: 300px; background: #87CEEB; bottom: -50px; right: -50px; }
-        .card { background: #fff; padding: 40px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { font-size: 1.8rem; margin-bottom: 20px; color: #333; }
-        .form-group { text-align: left; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
+        .circle { position: absolute; border-radius: 50%; opacity: 0.2; filter: blur(90px); }
+        .c1 { width: 400px; height: 400px; background: #58111A; top: -100px; left: -100px; }
+        .c2 { width: 400px; height: 400px; background: #87CEEB; bottom: -100px; right: -100px; }
+        .wrapper { max-width: 420px; margin: 0 auto; }
+        .card { background: #fff; padding: 32px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        h1 { font-size: 1.6rem; margin-bottom: 15px; color: #1a1a1a; }
+        p { font-size: 0.95rem; line-height: 1.6; color: #515154; margin-bottom: 20px; }
+        .info-block { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; }
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; }
-        button { width: 100%; background: #58111A; color: white; padding: 16px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: background 0.3s; }
-        button:hover { background: #7a1723; }
+        .btn-submit { width: 100%; background: #58111A; color: #fff; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -28,30 +30,40 @@
     <div class="circle c2"></div>
 </div>
 
-<div class="card">
-    <h1>Никита & Анастасия</h1>
-    <p style="margin-bottom: 25px; color: #666;">Мы будем рады видеть вас на нашей свадьбе!</p>
+<div class="wrapper">
+    <div class="card">
+        <h1>Никита & Анастасия</h1>
+        <p>Мы будем рады разделить с вами этот особенный день! Приглашаем вас на торжество, которое состоится в кругу самых близких людей.</p>
+        
+        <div class="info-block">
+            <p><strong>Дата:</strong> 25 июля 2026 г.</p>
+            <p><strong>Место:</strong> Ресторан "Усадьба"</p>
+        </div>
+    </div>
 
-    <form action="https://formspree.io/f/meedpbyy" method="POST">
-        <div class="form-group">
-            <label>Ваше Имя и Фамилия</label>
-            <input type="text" name="Имя" required placeholder="Введите имя">
-        </div>
-        <div class="form-group">
-            <label>Сможете присутствовать?</label>
-            <select name="Присутствие">
-                <option value="Да, буду">Да, буду с радостью!</option>
-                <option value="Нет, не смогу">К сожалению, не смогу</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Количество человек</label>
-            <input type="number" name="Количество" value="1" min="1" max="10">
-        </div>
-        <button type="submit">Подтвердить участие</button>
-    </form>
+    <div class="card">
+        <form action="https://formspree.io/f/meedpbyy" method="POST">
+            <div class="form-group">
+                <label>Ваше Имя и Фамилия</label>
+                <input type="text" name="Имя" placeholder="Введите имя" required>
+            </div>
+            <div class="form-group">
+                <label>Присутствие</label>
+                <select name="Присутствие">
+                    <option value="Буду">Да, буду с удовольствием!</option>
+                    <option value="Не смогу">К сожалению, не смогу</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Количество гостей</label>
+                <input type="number" name="Количество" value="1" min="1" max="10">
+            </div>
+            <button type="submit" class="btn-submit">Отправить ответ</button>
+        </form>
+    </div>
 </div>
 
 </body>
 </html>
+
 
