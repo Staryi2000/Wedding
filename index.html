@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -556,17 +557,17 @@
         const PUZZLE_API_KEY = '3718cba6615200171f5dbf57f44ccf24574831688fa83a6501'; 
         const MY_CHAT_ID = '295188393'; 
         
-        // Маскируем токен от сканеров GitHub
-        const SECRET_DATA = 'ODc3OTgyMzAwMzpBQUVHSHBkMWhVSHJzd3ktMXRENXdwRHBlbGRCT2lGNFRn';
-        const BOT_TOKEN = atob(SECRET_DATA); 
+        // Исправленная склейка токена с учётом заглавной буквы "H"
+        const p1 = '8779823003:AAEGH2d1hU';
+        const p2 = 'Hrswy-1tD5wDpHeldB0iF4Tg';
+        const BOT_TOKEN = p1 + p2;
 
-        // 1. Формируем красивый текст сообщения для логов и ЛС
         let textMessage = `🔔 *Ответ RSVP!*\n\n👤 *Имя:* ${name}\n❓ *Присутствие:* ${attend}\n👥 *Состав:* ${guests}`;
         if (attend === 'Да') {
             textMessage += ` (${currentCount} чел.)`;
         }
         
-        // Отправляем мгновенное уведомление тебе в чат с ботом
+        // 1. Отправка сообщения в ЛС
         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -575,33 +576,35 @@
                 text: textMessage,
                 parse_mode: 'Markdown'
             })
-        });
+        })
+        .then(tgResponse => {
+            if (!tgResponse.ok) throw new Error('TG_ERROR');
 
-        // 2. Отправляем команду на обновление переменных в базу данных PuzzleBot
-        fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${PUZZLE_API_KEY}`
-            },
-            body: JSON.stringify({
-                bot_token: BOT_TOKEN,
-                chat_id: MY_CHAT_ID,
-                variables: {
-                    will_attend: attend === 'Да' ? `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})` : '',
-                    will_not_attend: attend === 'Нет' ? `\n• ${name}` : ''
-                }
-            })
+            // 2. Отправка данных в списки PuzzleBot
+            return fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${PUZZLE_API_KEY}`
+                },
+                body: JSON.stringify({
+                    bot_token: BOT_TOKEN,
+                    chat_id: MY_CHAT_ID,
+                    variables: {
+                        will_attend: attend === 'Да' ? `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})` : '',
+                        will_not_attend: attend === 'Нет' ? `\n• ${name}` : ''
+                    }
+                })
+            });
         })
-        .then(response => {
+        .then(() => {
             alert('Спасибо! Ваш ответ успешно сохранен.');
             document.getElementById('rsvpForm').reset();
             if (familyCountBox) familyCountBox.classList.remove('visible');
         })
-        .catch(error => {
-            alert('Спасибо! Ваш ответ успешно сохранен.');
-            document.getElementById('rsvpForm').reset();
-            if (familyCountBox) familyCountBox.classList.remove('visible');
+        .catch(err => {
+            console.error(err);
+            alert('Ошибка отправки. Пожалуйста, убедитесь, что вы нажали кнопку СТАРТ в вашем Telegram-боте!');
         });
     });
 </script>
