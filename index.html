@@ -96,37 +96,33 @@ position: relative;
 z-index: 1;
 }
 
-/* СТАБИЛЬНАЯ АНИМАЦИЯ ПРОЯВЛЕНИЯ КАРТОЧЕК */
+/* СТАБИЛЬНАЯ И БЕЗОПАСНАЯ АНИМАЦИЯ С КЛАССАМИ ВИДИМОСТИ */
 .card {
 opacity: 0;
-will-change: opacity;
-transition: opacity 0.6s ease-in-out;
+transform: translateY(20px);
+will-change: transform, opacity;
+transition: opacity 0.6s ease-out, transform 0.6s ease-out;
 }
 
-/* Внутренние элементы плавно проявляются вслед за появлением самой карточки */
-.card .anim-fade-up {
-opacity: 0;
-transition: opacity 0.8s ease-in-out;
-transition-delay: 0.15s; /* Небольшая статусная задержка для красоты */
+/* Первые две карточки видны сразу, чтобы не было пустых экранов */
+.card.initial-visible {
+opacity: 1 !important;
+transform: translateY(0) !important;
 }
 
-/* Когда карточка становится видимой, проявляем и её содержимое */
 .card.is-visible {
 opacity: 1 !important;
+transform: translateY(0) !important;
 }
 
-.card.is-visible .anim-fade-up {
-opacity: 1 !important;
+/* Внутренние элементы больше НЕ скрываются принудительно через opacity 0, они анимируются мягко */
+.anim-fade-up {
+animation: softFadeIn 0.8s ease-in-out forwards;
 }
 
-/* Первые два блока плавно появляются сразу по CSS-анимации */
-.initial-visible {
-animation: pureFadeIn 0.8s ease-in-out forwards;
-}
-
-@keyframes pureFadeIn {
-0% { opacity: 0; }
-100% { opacity: 1; }
+@keyframes softFadeIn {
+0% { opacity: 0.4; transform: scale(0.98); }
+100% { opacity: 1; transform: scale(1); }
 }
 
 .card {
@@ -382,6 +378,10 @@ text-align: center;
 /* СТИЛИЗАЦИЯ БЛОКА ОБРАТНОГО ОТСЧЕТА */
 .countdown-box {
 margin: 14px 0 20px 0;
+min-height: 62px; /* Фиксирует высоту, чтобы верстка не прыгала */
+display: flex;
+justify-content: center;
+align-items: center;
 }
 
 .countdown-container {
@@ -422,10 +422,12 @@ letter-spacing: 0.5px;
 font-size: 1.15rem;
 font-weight: 600;
 color: #58111A;
-padding: 10px;
+padding: 12px 20px;
 background: #fdf5f6;
-border-radius: 12px;
+border-radius: 14px;
 display: inline-block;
+text-align: center;
+box-shadow: 0 4px 15px rgba(88, 17, 26, 0.05);
 }
 
 .success-message {
@@ -541,7 +543,7 @@ margin-top: 15px;
 <div class="final-text">
 <span id="countdownTitle">До встречи на нашей свадьбе через:</span>
 <div class="countdown-box" id="countdownBox">
-<div class="countdown-container" id="timerContainer">
+<div class="countdown-container">
 <div class="countdown-item">
 <div class="countdown-number" id="days">00</div>
 <div class="countdown-label" id="daysLabel">Дней</div>
@@ -581,9 +583,10 @@ const difference = stopDate - now;
 const titleEl = document.getElementById('countdownTitle');
 const boxEl = document.getElementById('countdownBox');
 
+// Жёсткая проверка: если разница меньше нуля — скрываем надпись и выводим плашку
 if (difference <= 0) {
-if(titleEl) titleEl.style.display = 'none';
-if(boxEl) boxEl.innerHTML = '<div class="wedding-day-message">Этот долгожданный день настал! 🎉</div>';
+if (titleEl) titleEl.style.display = 'none';
+if (boxEl) boxEl.innerHTML = '<div class="wedding-day-message">Этот долгожданный день настал! 🎉</div>';
 return;
 }
 
@@ -595,7 +598,7 @@ const dEl = document.getElementById('days');
 const hEl = document.getElementById('hours');
 const mEl = document.getElementById('minutes');
 
-if(dEl && hEl && mEl) {
+if (dEl && hEl && mEl) {
 dEl.innerText = days < 10 ? '0' + days : days;
 hEl.innerText = hours < 10 ? '0' + hours : hours;
 mEl.innerText = minutes < 10 ? '0' + minutes : minutes;
@@ -606,9 +609,11 @@ document.getElementById('minutesLabel').innerText = getNounDeclension(minutes, '
 }
 }
 
+// Первичный вызов и интервал
 updateCountdown();
 setInterval(updateCountdown, 60000);
 
+// Скелетон картинки ЗАГСа
 const weddingImg = document.getElementById('weddingImg');
 const imgWrapper = document.getElementById('imgWrapper');
 if (weddingImg && imgWrapper) {
@@ -617,5 +622,85 @@ imgWrapper.classList.remove('loading');
 weddingImg.classList.add('loaded');
 }
 if (weddingImg.complete) { handleImageLoaded(); } 
-else { weddingImg.addEventListener('load', handleImageLoaded);
+else { weddingImg.addEventListener('load', handleImageLoaded); }
+}
+
+// Параллакс
+const blurWine = document.getElementById('blurWine');
+const blurBlue = document.getElementById('blurBlue');
+window.addEventListener('scroll', () => {
+const scrolled = window.pageYOffset;
+if (blurWine) blurWine.style.transform = `translateY(${scrolled * 0.15}px)`; 
+if (blurBlue) blurBlue.style.transform = `translateY(${scrolled * -0.1}px)`;
+});
+
+// Безопасный Intersection Observer для карточек
+const observerTargets = document.querySelectorAll('.js-observer-target');
+const observerOptions = { root: null, rootMargin: '0px 0px -4% 0px', threshold: 0.05 };
+
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.target.classList.contains('initial-visible')) {
+entry.target.classList.add('is-visible');
+return;
+}
+if (entry.isIntersecting) { 
+entry.target.classList.add('is-visible'); 
+}
+});
+}, observerOptions);
+
+observerTargets.forEach(target => observer.observe(target));
+
+// Раскрытие селектора семьи
+document.querySelectorAll('input[name="Состав_гостей"]').forEach(radio => {
+radio.addEventListener('change', function() {
+const familyCountBox = document.getElementById('familyCountBox');
+const familyInput = document.getElementById('familyCount');
+if (this.value === 'Придем семьей') {
+familyCountBox.classList.add('visible');
+familyInput.setAttribute('required', 'true');
+} else {
+familyCountBox.classList.remove('visible');
+familyInput.removeAttribute('required');
+familyInput.value = '';
+}
+});
+});
+
+// Форма Formspree
+document.getElementById('rsvpForm').addEventListener('submit', function(e) {
+e.preventDefault();
+const form = this;
+const submitBtn = document.getElementById('submitBtn');
+const successBox = document.getElementById('successBox');
+
+submitBtn.disabled = true;
+submitBtn.innerText = 'Отправка...';
+
+fetch('https://formspree.io/f/meedpbyy', {
+method: 'POST',
+body: new FormData(form),
+headers: { 'Accept': 'application/json' }
+})
+.then(response => {
+if (response.ok) {
+form.style.display = 'none';
+successBox.style.display = 'block';
+} else {
+alert('Произошла ошибка отправки.');
+submitBtn.disabled = false;
+submitBtn.innerText = 'Отправить ответ';
+}
+})
+.catch(error => {
+alert('Ошибка сети.');
+submitBtn.disabled = false;
+submitBtn.innerText = 'Отправить ответ';
+});
+});
+</script>
+
+</body>
+</html>
 
