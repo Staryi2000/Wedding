@@ -608,7 +608,7 @@ familyInput.value = ''; // Полностью стираем цифры, есл�
 });
 });
 
-// Форма Formspree - гарантированная отправка
+// Форма Formspree - самая надежная версия для iOS
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const form = this;
@@ -618,25 +618,33 @@ document.getElementById('rsvpForm').addEventListener('submit', function(e) {
     submitBtn.disabled = true;
     submitBtn.innerText = 'Отправка...';
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://formspree.io/f/meedpbyy');
-    xhr.setRequestHeader('Accept', 'application/json');
-    
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState !== XMLHttpRequest.DONE) return;
-        
-        if (xhr.status === 200) {
+    fetch('https://formspree.io/f/meedpbyy', {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
             form.style.display = 'none';
             successBox.style.display = 'block';
         } else {
-            alert('Ошибка отправки: ' + xhr.status);
+            // Если сервер ответил с ошибкой
+            alert('Ошибка сервера. Попробуйте еще раз.');
             submitBtn.disabled = false;
             submitBtn.innerText = 'Отправить ответ';
         }
-    };
-    
-    xhr.send(new FormData(form));
+    })
+    .catch(error => {
+        // Ошибка 0 чаще всего здесь, если браузер блокирует запрос
+        console.error('RSVP Error:', error);
+        alert('Не удалось отправить форму. Попробуйте отключить VPN или открыть ссылку в обычном Safari (не в Telegram).');
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Отправить ответ';
+    });
 });
+
 </script>
 
 </body>
