@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -304,7 +305,21 @@ color: #1d1d1f;
 -webkit-appearance: none;
 }
 
-/* ПЛАВНАЯ АНИМАЦИЯ РАСКРЫТИЯ КОЛИЧЕСТВА ЧЕЛОВЕК */
+/* ПЛАВНАЯ АНИМАЦИЯ ДЛЯ ДИНАМИЧЕСКИХ БЛОКОВ */
+.company-block-container {
+max-height: 500px;
+opacity: 1;
+overflow: hidden;
+transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, margin-top 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.company-block-container.hidden {
+max-height: 0 !important;
+opacity: 0 !important;
+margin-top: 0 !important;
+pointer-events: none;
+}
+
 .family-count-container {
 max-height: 0;
 opacity: 0;
@@ -462,6 +477,7 @@ margin-top: 15px;
 </div>
 </div>
 
+<div class="company-block-container" id="companyBlock">
 <div class="form-group">
 <label>Вы придете один или компанией?</label>
 <div class="radio-group">
@@ -473,6 +489,7 @@ margin-top: 15px;
 <div class="family-count-container" id="familyCountBox">
 <label for="familyCount" style="color: #58111A; font-weight: 600;">Указать количество человек:</label>
 <input type="number" id="familyCount" name="Количество_человек" min="2" max="10" placeholder="Например: 3">
+</div>
 </div>
 </div>
 
@@ -522,14 +539,35 @@ entries.forEach(entry => {
 if (entry.isIntersecting) { 
 entry.target.classList.add('is-visible'); 
 } else {
-entry.target.classList.remove('is-visible'); // Сбрасываем состояние при уходе с экрана
+entry.target.classList.remove('is-visible'); 
 }
 });
 }, observerOptions);
 
 observerTargets.forEach(target => observer.observe(target));
 
-// Раскрытие селектора семьи
+// Логика переключения «Присутствие» (Скрытие блока компании)
+document.querySelectorAll('input[name="Присутствие"]').forEach(radio => {
+radio.addEventListener('change', function() {
+const companyBlock = document.getElementById('companyBlock');
+const familyCountBox = document.getElementById('familyCountBox');
+const familyInput = document.getElementById('familyCount');
+
+if (this.value === 'К сожалению, не смогу') {
+companyBlock.classList.add('hidden');
+// Сбрасываем и убираем обязательность инпута количества человек
+familyCountBox.classList.remove('visible');
+familyInput.removeAttribute('required');
+familyInput.value = '';
+// Сбрасываем выбор состава гостей на дефолтный (один), чтобы в форму не ушли старые данные
+document.querySelector('input[name="Состав_гостей"][value="Приду один / одна"]').checked = true;
+} else {
+companyBlock.classList.remove('hidden');
+}
+});
+});
+
+// Раскрытие селектора семьи (Количество человек)
 document.querySelectorAll('input[name="Состав_гостей"]').forEach(radio => {
 radio.addEventListener('change', function() {
 const familyCountBox = document.getElementById('familyCountBox');
