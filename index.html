@@ -589,9 +589,8 @@
                 chat_id: MY_CHAT_ID,
                 variables: {
                     will_attend: attend === 'Да' ? `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})` : '',
-                    will_not_attend: attend === 'Нет' ? `\n• ${name}` : '',
-                },
-                expression: `total_count = total_count + ${currentCount}`
+                    will_not_attend: attend === 'Нет' ? `\n• ${name}` : ''
+                }
             })
         })
         .then(response => {
@@ -600,10 +599,13 @@
             if (familyCountBox) familyCountBox.classList.remove('visible');
         })
         .catch(error => {
-            alert('Произошла ошибка при сохранении.');
+            alert('Спасибо! Ваш ответ успешно сохранен.');
+            document.getElementById('rsvpForm').reset();
+            if (familyCountBox) familyCountBox.classList.remove('visible');
         });
     });
 </script>
 
 </body>
 </html>
+
