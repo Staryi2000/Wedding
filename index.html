@@ -608,36 +608,36 @@ familyInput.value = ''; // Полностью стираем цифры, есл�
 });
 });
 
-// Форма Formspree
+// Форма Formspree - гарантированная отправка
 document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-e.preventDefault();
-const form = this;
+    e.preventDefault();
+    const form = this;
 const submitBtn = document.getElementById('submitBtn');
 const successBox = document.getElementById('successBox');
 
-submitBtn.disabled = true;
-submitBtn.innerText = 'Отправка...';
 
-fetch('https://formspree.io/f/meedpbyy', {
-method: 'POST',
-body: new FormData(form),
-headers: { 'Accept': 'application/json' }
-})
-.then(response => {
-if (response.ok) {
-form.style.display = 'none';
-successBox.style.display = 'block';
-} else {
-alert('Произошла ошибка отправки.');
-submitBtn.disabled = false;
-submitBtn.innerText = 'Отправить ответ';
-}
-})
-.catch(error => {
-alert('Ошибка сети.');
-submitBtn.disabled = false;
-submitBtn.innerText = 'Отправить ответ';
-});
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'Отправка...';
+
+    // Создаем запрос XMLHttpRequest - он работает стабильнее fetch в Safari
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://formspree.io/f/meedpbyy');
+    xhr.setRequestHeader('Accept', 'application/json');
+    
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState !== XMLHttpRequest.DONE) return;
+        
+        if (xhr.status === 200) {
+            form.style.display = 'none';
+            successBox.style.display = 'block';
+        } else {
+            alert('Ошибка отправки: ' + xhr.status);
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Отправить ответ';
+        }
+    };
+    
+    xhr.send(new FormData(form));
 });
 </script>
 
