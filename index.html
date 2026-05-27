@@ -10,18 +10,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* ТОТАЛЬНОЕ УДАЛЕНИЕ СИНЕЙ РАМКИ И ВЫДЕЛЕНИЙ ПРИ ТАПЕ С ТЕЛЕФОНА */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent; /* Убирает темную вспышку при тапе на смартфонах */
+            
+            /* Полностью отключаем системную подсветку клика во всех мобильных браузерах */
+            -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+            -webkit-tap-highlight-color: transparent !important;
+            -moz-tap-highlight-color: transparent !important;
+            
+            /* Убираем контур фокусировки */
+            outline: none !important;
+            outline-width: 0 !important;
         }
 
-        /* УБИРАЕМ КРИВУЮ ГОЛУБУЮ ОБВОДКУ ПРИ КЛИКАХ НА ВСЕ ЭЛЕМЕНТЫ */
-        *:focus {
+        /* Подавляем рамки для всех возможных состояний кнопок, ссылок-карт и чекбоксов */
+        *:focus, *:active, *:hover, *:visited, *:focus-within, *:focus-visible {
             outline: none !important;
+            outline: 0 !important;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        /* Персональный хук для элементов ввода, кнопок и ссылок-оберток (как наша карта) */
+        input, button, select, textarea, a, label, span {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+            outline: none !important;
+        }
+
+        /* Убираем контур у интерактивных блоков внутри ссылок */
+        a * {
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent !important;
         }
 
         body {
@@ -148,7 +173,6 @@
             background-color: #e2e8f0;
         }
 
-        /* Эффект пульсации */
         .image-container.loading::after {
             content: "";
             position: absolute;
@@ -170,7 +194,7 @@
             object-fit: cover;
             display: block;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out; /* Картинка проявится плавно */
+            transition: opacity 0.5s ease-in-out;
         }
 
         .location-img.loaded {
@@ -468,7 +492,6 @@
 </div>
 
 <script>
-    // Управление умной загрузкой фото ЗАГСа
     const weddingImg = document.getElementById('weddingImg');
     const imgWrapper = document.getElementById('imgWrapper');
 
