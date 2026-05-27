@@ -18,18 +18,13 @@ margin: 0;
 padding: 0;
 font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 -webkit-font-smoothing: antialiased;
-
-/* Полностью отключаем системную подсветку клика во всех мобильных браузерах */
 -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
 -webkit-tap-highlight-color: transparent !important;
 -moz-tap-highlight-color: transparent !important;
-
-/* Убираем контур фокусировки */
 outline: none !important;
 outline-width: 0 !important;
 }
 
-/* Подавляем рамки для всех возможных состояний кнопок, ссылок-карт и чекбоксов */
 *:focus, *:active, *:hover, *:visited, *:focus-within, *:focus-visible {
 outline: none !important;
 outline: 0 !important;
@@ -37,14 +32,12 @@ box-shadow: none !important;
 -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Персональный хук для элементов ввода, кнопок и ссылок-оберток (как наша карта) */
 input, button, select, textarea, a, label, span {
 -webkit-tap-highlight-color: transparent !important;
 -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
 outline: none !important;
 }
 
-/* Убираем контур у интерактивных блоков внутри ссылок */
 a * {
 outline: none !important;
 -webkit-tap-highlight-color: transparent !important;
@@ -109,35 +102,27 @@ position: relative;
 z-index: 1;
 }
 
-/* БАЗОВЫЕ СТИЛИ ДЛЯ АНИМАЦИИ С КОРРЕКТНЫМ WILL-CHANGE И НОВОЙ СТРАТЕГИЕЙ ЗАГРУЗКИ */
+/* СТАБИЛЬНАЯ АНИМАЦИЯ БЕЗ ГЕОМЕТРИЧЕСКИХ СДВИГОВ — ДЛЯ ЗАЩИТЫ ОТ ТРЯСКИ */
 .card, .anim-fade-up {
 opacity: 0;
-transform: translateY(30px) scale(0.98);
-will-change: transform, opacity;
-transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
+will-change: opacity;
+transition: opacity 0.6s ease-in-out;
 }
 
-/* Эффект интерактивного скролла для всех блоков */
+/* Эффект плавного появления/исчезания при скроллинге */
 .is-visible {
 opacity: 1 !important;
-transform: translateY(0) scale(1) !important;
 }
 
-/* Анимация при стартовой загрузке: только для первых блоков */
+/* Стартовое появление первых двух блоков при загрузке */
 .initial-load {
-animation: startFadeUp 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-opacity: 1; /* Предотвращает мигание перед стартом */
+animation: startFadeIn 0.8s ease-in-out forwards;
+opacity: 1;
 }
 
-@keyframes startFadeUp {
-0% {
-opacity: 0;
-transform: translateY(30px) scale(0.98);
-}
-100% {
-opacity: 1;
-transform: translateY(0) scale(1);
-}
+@keyframes startFadeIn {
+0% { opacity: 0; }
+100% { opacity: 1; }
 }
 
 .card {
@@ -181,7 +166,7 @@ color: #1d1d1f;
 margin-top: 12px;
 }
 
-/* МИГАЮЩИЙ СКЕЛЕТОН ДЛЯ ПЛАВНОЙ ЗАГРУЗКИ КАРТИНКИ ЗАГСа */
+/* МИГАЮЩИЙ СКЕЛЕТОН ДЛЯ КАРТИНКИ */
 .image-container {
 width: 100%;
 height: 210px;
@@ -280,13 +265,7 @@ border: 1px solid rgba(0,0,0,0.04);
 display: flex;
 flex-direction: column;
 min-width: 0;
-transition-delay: 0s;
 }
-
-.pantone-card:nth-child(1) { transition-delay: 0.1s; }
-.pantone-card:nth-child(2) { transition-delay: 0.2s; }
-.pantone-card:nth-child(3) { transition-delay: 0.3s; }
-.pantone-card:nth-child(4) { transition-delay: 0.4s; }
 
 .pantone-color {
 width: 100%;
@@ -353,7 +332,7 @@ margin-top: 0;
 }
 
 .family-count-container.visible {
-max-height: 100px; /* Достаточная высота для размещения инпута с лейблом */
+max-height: 100px;
 opacity: 1;
 transform: translateY(0);
 margin-top: 14px;
@@ -417,7 +396,56 @@ color: #1d1d1f;
 text-align: center;
 }
 
-/* Стиль для красивого кастомного окна успешной отправки */
+/* СТИЛИЗАЦИЯ БЛОКА ОБРАТНОГО ОТСЧЕТА */
+.countdown-box {
+margin: 14px 0 20px 0;
+}
+
+.countdown-container {
+display: flex;
+justify-content: center;
+gap: 16px;
+}
+
+.countdown-item {
+display: flex;
+flex-direction: column;
+align-items: center;
+min-width: 60px;
+}
+
+.countdown-number {
+font-size: 1.5rem;
+font-weight: 700;
+color: #58111A;
+background: #f5f5f7;
+padding: 8px 12px;
+border-radius: 12px;
+width: 100%;
+text-align: center;
+box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.countdown-label {
+font-size: 0.7rem;
+font-weight: 500;
+color: #86868b;
+margin-top: 6px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+}
+
+.wedding-day-message {
+font-size: 1.15rem;
+font-weight: 600;
+color: #58111A;
+padding: 10px;
+background: #fdf5f6;
+border-radius: 12px;
+display: inline-block;
+animation: startFadeIn 0.5s ease;
+}
+
 .success-message {
 display: none;
 background: #f4fbf7;
@@ -429,7 +457,6 @@ font-size: 1rem;
 font-weight: 600;
 text-align: center;
 margin-top: 15px;
-animation: skeleton-loading 0.5s ease;
 }
 </style>
 </head>
@@ -518,143 +545,4 @@ animation: skeleton-loading 0.5s ease;
 
 <div class="family-count-container" id="familyCountBox">
 <label for="familyCount" style="color: #58111A; font-weight: 600;">Указать количество человек:</label>
-<input type="number" id="familyCount" name="Количество_человек" min="2" max="10" placeholder="Например: 3">
-</div>
-</div>
-
-<button type="submit" class="btn-submit" id="submitBtn">Отправить ответ</button>
-</form>
-
-<div class="success-message" id="successBox">
-🎉 Спасибо! Ваш ответ успешно отправлен.
-</div>
-
-<div class="final-text">
-До встречи на нашей свадьбе!<br>
-<span style="display: block; font-size: 0.95rem; font-weight: 600; color: #58111A; margin-top: 8px;">Никита и Анастасия</span>
-</div>
-</div>
-
-</div>
-
-<script>
-const weddingImg = document.getElementById('weddingImg');
-const imgWrapper = document.getElementById('imgWrapper');
-
-function handleImageLoaded() {
-imgWrapper.classList.remove('loading');
-weddingImg.classList.add('loaded');
-}
-
-if (weddingImg.complete) {
-handleImageLoaded();
-} else {
-weddingImg.addEventListener('load', handleImageLoaded);
-}
-
-// 1. ПАРАЛЛАКС ФОНА
-const blurWine = document.getElementById('blurWine');
-const blurBlue = document.getElementById('blurBlue');
-
-window.addEventListener('scroll', () => {
-const scrolled = window.pageYOffset;
-blurWine.style.transform = `translateY(${scrolled * 0.15}px)`; 
-blurBlue.style.transform = `translateY(${scrolled * -0.1}px)`;
-});
-
-// 2. ИСПРАВЛЕННЫЙ INTERSECTION OBSERVER С ЗАЩИТОЙ ОТ ТРЯСКИ НА IOS И ПОДДЕРЖКОЙ СТАРТОВОЙ АНИМАЦИИ
-const observerTargets = document.querySelectorAll('.js-observer-target');
-const observerOptions = {
-root: null,
-// rootMargin задает безопасную зону внутри экрана, предотвращая бесконечные циклы переключения классов на айфонах
-rootMargin: '-8% 0px -8% 0px',
-threshold: 0.01
-};
-
-const observer = new IntersectionObserver((entries) => {
-entries.forEach(entry => {
-// Если блок — это первые два, мы отключаем для них скролл-анимацию на время загрузки
-if (entry.target.classList.contains('initial-load')) return;
-
-if (entry.isIntersecting) {
-entry.target.classList.add('is-visible');
-} else {
-entry.target.classList.remove('is-visible'); // Сохранено скрытие при обратном скролле по твоему запросу
-}
-});
-}, observerOptions);
-
-observerTargets.forEach(target => {
-observer.observe(target);
-});
-
-// Новая логика стартового появления
-window.addEventListener('DOMContentLoaded', () => {
-const firstTwoCards = document.querySelectorAll('.js-observer-target:nth-child(-n+2)'); // Выбираем первые две карточки
-firstTwoCards.forEach(card => {
-card.classList.add('initial-load'); // Применяем CSS-анимацию
-// После завершения анимации (через 0.9с) разрешаем InterscetionObserver управлять ими
-setTimeout(() => {
-card.classList.remove('initial-load'); 
-card.classList.add('is-visible'); // Фиксируем видимость
-}, 910);
-});
-});
-
-// 3. ПОЛЕ ДЛЯ СЕМЬИ С УЛУЧШЕННОЙ ВЫБОРКОЙ И ПЛАВНОЙ АНИМАЦИЕЙ
-document.querySelectorAll('input[name="Состав_гостей"]').forEach(radio => {
-radio.addEventListener('change', function() {
-const familyCountBox = document.getElementById('familyCountBox');
-const familyInput = document.getElementById('familyCount');
-if (this.value === 'Придем семьей') {
-familyCountBox.classList.add('visible');
-familyInput.setAttribute('required', 'true');
-} else {
-familyCountBox.classList.remove('visible');
-familyInput.removeAttribute('required');
-familyInput.value = '';
-}
-});
-});
-
-// 4. НАДЕЖНАЯ ОТПРАВКА ДАННЫХ В FORMSPREE БЕЗ ПЕРЕЗАГРУЗКИ СТРАНИЦЫ
-document.getElementById('rsvpForm').addEventListener('submit', function(e) {
-e.preventDefault();
-
-const form = this;
-const submitBtn = document.getElementById('submitBtn');
-const successBox = document.getElementById('successBox');
-
-submitBtn.disabled = true;
-submitBtn.innerText = 'Отправка...';
-
-const formData = new FormData(form);
-
-fetch('https://formspree.io/f/meedpbyy', {
-method: 'POST',
-body: formData,
-headers: {
-'Accept': 'application/json'
-}
-})
-.then(response => {
-if (response.ok) {
-form.style.display = 'none';
-successBox.style.display = 'block';
-} else {
-alert('Произошла ошибка конфигурации. Проверьте статус формы.');
-submitBtn.disabled = false;
-submitBtn.innerText = 'Отправить ответ';
-}
-})
-.catch(error => {
-alert('Ошибка сети. Проверьте интернет-соединение.');
-submitBtn.disabled = false;
-submitBtn.innerText = 'Отправить ответ';
-});
-});
-</script>
-
-</body>
-</html>
-
+<input type="number" id="familyCount" name="Количество_человек" min="2" max="10" placeholder
