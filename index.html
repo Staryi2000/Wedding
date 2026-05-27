@@ -537,7 +537,7 @@
         });
     });
 
-    // ОТПРАВКА ДАННЫХ В PUZZLEBOT И ТЕЛЕГРАМ
+    // ОБРАБОТКА И ОТПРАВКА ДАННЫХ
     document.getElementById('rsvpForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -557,7 +557,6 @@
         const PUZZLE_API_KEY = '3718cba6615200171f5dbf57f44ccf24574831688fa83a6501'; 
         const MY_CHAT_ID = '295188393'; 
         
-        // Исправленная склейка токена с учётом заглавной буквы "H"
         const p1 = '8779823003:AAEGH2d1hU';
         const p2 = 'Hrswy-1tD5wDpHeldB0iF4Tg';
         const BOT_TOKEN = p1 + p2;
@@ -567,7 +566,7 @@
             textMessage += ` (${currentCount} чел.)`;
         }
         
-        // 1. Отправка сообщения в ЛС
+        // 1. Сначала шлем прямое текстовое уведомление тебе в ЛС
         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -578,9 +577,18 @@
             })
         })
         .then(tgResponse => {
-            if (!tgResponse.ok) throw new Error('TG_ERROR');
+            if (!tgResponse.ok) throw new Error('TG_MESSAGE_FAIL');
 
-            // 2. Отправка данных в списки PuzzleBot
+            // Подготовка переменных согласно синтаксису PuzzleBot API
+            let variablesData = {};
+            if (attend === 'Да') {
+                const guestText = `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})`;
+                variablesData['will_attend'] = guestText;
+            } else {
+                variablesData['will_not_attend'] = `\n• ${name}`;
+            }
+
+            // 2. Отправляем изменения переменных в PuzzleBot
             return fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
                 method: 'POST',
                 headers: { 
@@ -590,14 +598,16 @@
                 body: JSON.stringify({
                     bot_token: BOT_TOKEN,
                     chat_id: MY_CHAT_ID,
-                    variables: {
-                        will_attend: attend === 'Да' ? `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})` : '',
-                        will_not_attend: attend === 'Нет' ? `\n• ${name}` : ''
-                    }
+                    variables: variablesData,
+                    expression: `total_count = total_count + ${currentCount}`
                 })
             });
         })
-        .then(() => {
+        .then(pbResponse => {
+            if (!pbResponse.ok) throw new Error('PUZZLE_API_FAIL');
+            return pbResponse.json();
+        })
+        .then(pbData => {
             alert('Спасибо! Ваш ответ успешно сохранен.');
             document.getElementById('rsvpForm').reset();
             if (familyCountBox) familyCountBox.classList.remove('visible');
