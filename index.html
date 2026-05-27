@@ -90,6 +90,7 @@ display: flex;
 flex-direction: column;
 gap: 20px;
 max-width: 420px;
+margin: 0 flex;
 margin: 0 auto;
 padding-bottom: 40px;
 position: relative;
@@ -306,13 +307,14 @@ color: #1d1d1f;
 -webkit-appearance: none;
 } 
 
-/* ПЛАВНОЕ СХЛОПЫВАНИЕ БЕЗ ТРЯСКИ И МИКРО-РЫВКОВ ПРИ СКРЫТИИ */
+/* ЖЕСТКИЙ ОТСТУП: Добавили padding-bottom, чтобы гарантированно отодвинуть кнопку отправки */
 .company-block-container {
-max-height: 300px;
+max-height: 350px;
 opacity: 1;
 overflow: hidden;
 transition: max-height 0.45s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.35s ease, padding 0.45s ease, margin 0.45s ease;
 margin-top: 0;
+padding-bottom: 10px;
 } 
 
 .company-block-container.hidden {
@@ -334,13 +336,12 @@ transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, tr
 margin-top: 0;
 } 
 
-/* ИСПРАВЛЕНО: Добавлен нижний отступ, чтобы инпут не вжимался в кнопку отправки */
 .family-count-container.visible {
 max-height: 120px;
 opacity: 1;
 transform: translateY(0);
 margin-top: 14px;
-margin-bottom: 18px;
+margin-bottom: 0;
 } 
 
 .radio-group {
@@ -714,3 +715,4 @@ submitBtn.innerText = 'Отправить ответ';
 
 </body>
 </html>
+
