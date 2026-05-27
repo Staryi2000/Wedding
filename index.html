@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* БАЗОВЫЙ СБРОС И ОТКЛЮЧЕНИЕ СИНЕЙ ПОДСВЕТКИ */
+/* ТОТАЛЬНОЕ УДАЛЕНИЕ СИНЕЙ РАМКИ И ВЫДЕЛЕНИЙ ПРИ ТАПЕ С ТЕЛЕФОНА */
 * {
 box-sizing: border-box;
 margin: 0;
@@ -19,6 +19,21 @@ font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 -webkit-font-smoothing: antialiased;
 -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
 -webkit-tap-highlight-color: transparent !important;
+-moz-tap-highlight-color: transparent !important;
+outline: none !important;
+outline-width: 0 !important;
+}
+
+*:focus, *:active, *:hover, *:visited, *:focus-within, *:focus-visible {
+outline: none !important;
+outline: 0 !important;
+box-shadow: none !important;
+-webkit-tap-highlight-color: transparent !important;
+}
+
+input, button, select, textarea, a, label, span {
+-webkit-tap-highlight-color: transparent !important;
+-webkit-tap-highlight-color: rgba(0,0,0,0) !important;
 outline: none !important;
 }
 
@@ -30,7 +45,7 @@ padding: 20px 16px;
 position: relative;
 }
 
-/* ФОНОВЫЕ ПЯТНА */
+/* ДВУХЦВЕТНЫЙ ИНТЕРАКТИВНЫЙ ФОН С ПАРАЛЛАКСОМ */
 .bg-blur-container {
 position: fixed;
 top: 0;
@@ -48,10 +63,12 @@ width: 450px;
 height: 450px;
 border-radius: 50%;
 background: #58111A;
-opacity: 0.15;
+opacity: 0.18;
 filter: blur(80px);
 top: -100px;
 left: -150px;
+will-change: transform;
+transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .blur-blue {
@@ -60,10 +77,12 @@ width: 500px;
 height: 500px;
 border-radius: 50%;
 background: #87CEEB;
-opacity: 0.18;
+opacity: 0.22;
 filter: blur(90px);
 bottom: -100px;
 right: -150px;
+will-change: transform;
+transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .wrapper {
@@ -77,20 +96,37 @@ position: relative;
 z-index: 1;
 }
 
-/* НАДЕЖНАЯ АНИМАЦИЯ: по умолчанию блоки СРАЗУ ВИДИМЫ (fallback), 
-   а если JS работает — они мягко проявятся через скрипт */
-.card, .anim-fade-up {
-opacity: 1;
-transition: opacity 0.5s ease-in-out;
-}
-
-/* Класс для плавной работы через скрипт */
-.js-animated {
+/* СТАБИЛЬНАЯ АНИМАЦИЯ ПРОЯВЛЕНИЯ КАРТОЧЕК */
+.card {
 opacity: 0;
+will-change: opacity;
+transition: opacity 0.6s ease-in-out;
 }
 
-.is-visible {
+/* Внутренние элементы плавно проявляются вслед за появлением самой карточки */
+.card .anim-fade-up {
+opacity: 0;
+transition: opacity 0.8s ease-in-out;
+transition-delay: 0.15s; /* Небольшая статусная задержка для красоты */
+}
+
+/* Когда карточка становится видимой, проявляем и её содержимое */
+.card.is-visible {
 opacity: 1 !important;
+}
+
+.card.is-visible .anim-fade-up {
+opacity: 1 !important;
+}
+
+/* Первые два блока плавно появляются сразу по CSS-анимации */
+.initial-visible {
+animation: pureFadeIn 0.8s ease-in-out forwards;
+}
+
+@keyframes pureFadeIn {
+0% { opacity: 0; }
+100% { opacity: 1; }
 }
 
 .card {
@@ -134,7 +170,7 @@ color: #1d1d1f;
 margin-top: 12px;
 }
 
-/* СКЕЛЕТОН И КАРТИНКА */
+/* МИГАЮЩИЙ СКЕЛЕТОН ДЛЯ КАРТИНКИ */
 .image-container {
 width: 100%;
 height: 210px;
@@ -152,6 +188,7 @@ top: 0; left: 0; width: 100%; height: 100%;
 background: linear-gradient(90deg, #e2e8f0 25%, #edf2f7 50%, #e2e8f0 75%);
 background-size: 200% 100%;
 animation: skeleton-loading 1.5s infinite;
+z-index: 2;
 }
 
 @keyframes skeleton-loading {
@@ -165,7 +202,7 @@ height: 100%;
 object-fit: cover;
 display: block;
 opacity: 0;
-transition: opacity 0.3s ease;
+transition: opacity 0.5s ease-in-out;
 }
 
 .location-img.loaded {
@@ -204,7 +241,7 @@ font-size: 0.85rem;
 box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
-/* PANTONE */
+/* ЦВЕТОВЫЕ ПЛАШКИ PANTONE */
 .pantone-container {
 display: flex;
 gap: 8px;
@@ -248,7 +285,7 @@ text-transform: uppercase;
 line-height: 1.2;
 }
 
-/* ФОРМА И ЭЛЕМЕНТЫ */
+/* ФОРМА И КНОПКА ОТПРАВКИ */
 .form-group {
 margin-bottom: 18px;
 text-align: left;
@@ -273,12 +310,13 @@ color: #1d1d1f;
 -webkit-appearance: none;
 }
 
+/* ПЛАВНАЯ АНИМАЦИЯ РАСКРЫТИЯ КОЛИЧЕСТВА ЧЕЛОВЕК */
 .family-count-container {
 max-height: 0;
 opacity: 0;
 transform: translateY(-10px);
 overflow: hidden;
-transition: max-height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+transition: max-height 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 margin-top: 0;
 }
 
@@ -304,16 +342,18 @@ cursor: pointer;
 background: #f5f5f7;
 padding: 15px;
 border-radius: 14px;
+border: 1px solid transparent;
 color: #1d1d1f;
+transition: background 0.2s, color 0.2s;
 }
 
 .radio-label input[type="radio"] {
 display: none;
 }
 
-.radio-label.checked-fallback {
-background: #58111A !important;
-color: #ffffff !important;
+.radio-label:has(input:checked) {
+background: #58111A;
+color: #ffffff;
 }
 
 .btn-submit {
@@ -339,7 +379,7 @@ color: #1d1d1f;
 text-align: center;
 }
 
-/* ОБРАТНЫЙ ОТСЧЕТ */
+/* СТИЛИЗАЦИЯ БЛОКА ОБРАТНОГО ОТСЧЕТА */
 .countdown-box {
 margin: 14px 0 20px 0;
 }
@@ -366,6 +406,7 @@ padding: 8px 12px;
 border-radius: 12px;
 width: 100%;
 text-align: center;
+box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .countdown-label {
@@ -404,31 +445,31 @@ margin-top: 15px;
 <body>
 
 <div class="bg-blur-container">
-<div class="blur-wine"></div>
-<div class="blur-blue"></div>
+<div class="blur-wine" id="blurWine"></div>
+<div class="blur-blue" id="blurBlue"></div>
 </div>
 
 <div class="wrapper">
 
-<div class="card js-observer-target">
+<div class="card initial-visible js-observer-target">
 <p class="status">Мы меняем статус</p>
 <h1>Никита & Анастасия</h1>
 <p>Совсем скоро состоится одно из самых важных и счастливых событий в нашей жизни — наша свадьба. Мы хотим разделить этот особенный день с самыми близкими, поэтому с огромной радостью приглашаем вас на наш праздник!</p>
 <div class="date">19 сентября 2026</div>
 </div>
 
-<div class="card js-observer-target">
+<div class="card initial-visible js-observer-target">
 <h1>Где и когда</h1>
 <p>Ждем вас <strong>19 сентября 2026 года в 14:00</strong> на сбор гостей и торжественную церемонию.</p>
 
-<div class="image-container loading" id="imgWrapper">
+<div class="image-container loading anim-fade-up" id="imgWrapper">
 <img src="./11747.jpeg" alt="Дворец бракосочетания Домодедово" class="location-img" id="weddingImg">
 </div>
 
 <p style="font-weight: 600; margin-bottom: 2px;">Локация:</p>
 <p style="margin-bottom: 10px; font-size: 0.9rem;">Отдел ЗАГС г. о. Домодедово<br><span style="color: #86868b; font-size: 0.8rem;">(Парк «Ёлочки», Каширское шоссе, 107, стр. 50)</span></p>
 
-<a href="https://yandex.ru/maps/org/ministerstvo_sotsialnogo_razvitiya_okruzhnoye_upravleniye_sotsialnykh_del_14_otdel_zags/76623943544?si=jhxmmjn9gj0132t0u50mbfywcc" target="_blank" class="map-preview-block">
+<a href="https://yandex.ru/maps/org/ministerstvo_sotsialnogo_razvitiya_okruzhnoye_upravleniye_sotsialnykh_del_14_otdel_zags/76623943544?si=jhxmmjn9gj0132t0u50mbfywcc" target="_blank" class="map-preview-block anim-fade-up">
 <div class="map-overlay">
 <div class="btn-map-overlay">Открыть на Яндекс Картах</div>
 </div>
@@ -439,7 +480,7 @@ margin-top: 15px;
 <h1>Дресс-код</h1>
 <p>Будем признательны, если вы поддержите стиль нашей свадьбы и выберете наряды в цветах палитры:</p>
 
-<div class="pantone-container">
+<div class="pantone-container anim-fade-up">
 <div class="pantone-card">
 <div class="pantone-color p-wine-dark"></div>
 <div class="pantone-meta"><div class="pantone-name">Deep Burgundy</div></div>
@@ -500,7 +541,7 @@ margin-top: 15px;
 <div class="final-text">
 <span id="countdownTitle">До встречи на нашей свадьбе через:</span>
 <div class="countdown-box" id="countdownBox">
-<div class="countdown-container">
+<div class="countdown-container" id="timerContainer">
 <div class="countdown-item">
 <div class="countdown-number" id="days">00</div>
 <div class="countdown-label" id="daysLabel">Дней</div>
@@ -515,169 +556,66 @@ margin-top: 15px;
 </div>
 </div>
 </div>
-<span style="display: block; font-size: 0.95rem; font-weight: 600; color: #58111A;">Никита и Анастасия</span>
+<span style="display: block; font-size: 0.95rem; font-weight: 600; color: #58111A; margin-top: 10px;">Никита и Анастасия</span>
 </div>
 </div>
 
 </div>
 
 <script>
-// ЛОГИКА ЗАГРУЗКИ КАРТИНКИ
-const weddingImg = document.getElementById('weddingImg');
-const imgWrapper = document.getElementById('imgWrapper');
-if (weddingImg) {
-    if (weddingImg.complete) {
-        imgWrapper.classList.remove('loading');
-        weddingImg.classList.add('loaded');
-    } else {
-        weddingImg.addEventListener('load', () => {
-            imgWrapper.classList.remove('loading');
-            weddingImg.classList.add('loaded');
-        });
-    }
-}
-
-// НАДЁЖНОЕ ПОЯВЛЕНИЕ БЛОКОВ ПРИ СКРОЛЛЕ БЕЗ ТРЯСКИ (ПЕРЕПИСАНО)
-const cards = document.querySelectorAll('.js-observer-target');
-
-// Инициализация: активируем анимацию только если JS успешно стартовал
-cards.forEach((card, index) => {
-    if (index > 1) { // Первые 2 карточки видны сразу без задержек
-        card.classList.add('js-animated');
-    }
-});
-
-function checkScroll() {
-    const triggerBottom = window.innerHeight * 0.95;
-    cards.forEach((card) => {
-        const cardTop = card.getBoundingClientRect().top;
-        if (cardTop < triggerBottom) {
-            card.classList.add('is-visible');
-        } else {
-            card.classList.remove('is-visible');
-        }
-    });
-}
-
-window.addEventListener('scroll', checkScroll);
-window.addEventListener('DOMContentLoaded', () => {
-    checkScroll();
-    updateCountdown();
-});
-
-// СКРИПТ ОБРАТНОГО ОТСЧЕТА С АВТОСТОПОМ 19 СЕНТЯБРЯ В 12:00
 function getNounDeclension(number, one, two, five) {
-    let n = Math.abs(number) % 100;
-    if (n >= 5 && n <= 20) return five;
-    n %= 10;
-    if (n === 1) return one;
-    if (n >= 2 && n <= 4) return two;
-    return five;
+let n = Math.abs(number);
+n %= 100;
+if (n >= 5 && n <= 20) return five;
+n %= 10;
+if (n === 1) return one;
+if (n >= 2 && n <= 4) return two;
+return five;
 }
 
 function updateCountdown() {
-    const stopDate = new Date('September 19, 2026 12:00:00').getTime();
-    const now = new Date().getTime();
-    const difference = stopDate - now;
+const stopDate = new Date('September 19, 2026 12:00:00').getTime();
+const now = new Date().getTime();
+const difference = stopDate - now;
 
-    if (difference <= 0) {
-        const title = document.getElementById('countdownTitle');
-        const box = document.getElementById('countdownBox');
-        if(title) title.style.display = 'none';
-        if(box) box.innerHTML = '<div class="wedding-day-message">Этот долгожданный день настал! 🎉</div>';
-        return;
-    }
+const titleEl = document.getElementById('countdownTitle');
+const boxEl = document.getElementById('countdownBox');
 
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-
-    const dEl = document.getElementById('days');
-    const hEl = document.getElementById('hours');
-    const mEl = document.getElementById('minutes');
-
-    if(dEl && hEl && mEl) {
-        dEl.innerText = days < 10 ? '0' + days : days;
-        hEl.innerText = hours < 10 ? '0' + hours : hours;
-        mEl.innerText = minutes < 10 ? '0' + minutes : minutes;
-
-        document.getElementById('daysLabel').innerText = getNounDeclension(days, 'День', 'Дня', 'Дней');
-        document.getElementById('hoursLabel').innerText = getNounDeclension(hours, 'Час', 'Часа', 'Часов');
-        document.getElementById('minutesLabel').innerText = getNounDeclension(minutes, 'Минута', 'Минуты', 'Минут');
-    }
+if (difference <= 0) {
+if(titleEl) titleEl.style.display = 'none';
+if(boxEl) boxEl.innerHTML = '<div class="wedding-day-message">Этот долгожданный день настал! 🎉</div>';
+return;
 }
+
+const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+const dEl = document.getElementById('days');
+const hEl = document.getElementById('hours');
+const mEl = document.getElementById('minutes');
+
+if(dEl && hEl && mEl) {
+dEl.innerText = days < 10 ? '0' + days : days;
+hEl.innerText = hours < 10 ? '0' + hours : hours;
+mEl.innerText = minutes < 10 ? '0' + minutes : minutes;
+
+document.getElementById('daysLabel').innerText = getNounDeclension(days, 'День', 'Дня', 'Дней');
+document.getElementById('hoursLabel').innerText = getNounDeclension(hours, 'Час', 'Часа', 'Часов');
+document.getElementById('minutesLabel').innerText = getNounDeclension(minutes, 'Минута', 'Минуты', 'Минут');
+}
+}
+
+updateCountdown();
 setInterval(updateCountdown, 60000);
 
-// ИНТЕРАКТИВНЫЕ РАДИОКНОПКИ
-function syncRadioStyles() {
-    document.querySelectorAll('.radio-group').forEach(group => {
-        group.querySelectorAll('.radio-label').forEach(label => {
-            const input = label.querySelector('input[type="radio"]');
-            if (input && input.checked) {
-                label.classList.add('checked-fallback');
-            } else {
-                label.classList.remove('checked-fallback');
-            }
-        });
-    });
+const weddingImg = document.getElementById('weddingImg');
+const imgWrapper = document.getElementById('imgWrapper');
+if (weddingImg && imgWrapper) {
+function handleImageLoaded() {
+imgWrapper.classList.remove('loading');
+weddingImg.classList.add('loaded');
 }
+if (weddingImg.complete) { handleImageLoaded(); } 
+else { weddingImg.addEventListener('load', handleImageLoaded);
 
-document.querySelectorAll('.radio-label input[type="radio"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        syncRadioStyles();
-        
-        // Показ поля "семья"
-        const familyCountBox = document.getElementById('familyCountBox');
-        const familyInput = document.getElementById('familyCount');
-        if (radio.name === 'Состав_гостей' && familyCountBox && familyInput) {
-            if (radio.value === 'Придем семьей') {
-                familyCountBox.classList.add('visible');
-                familyInput.setAttribute('required', 'true');
-            } else {
-                familyCountBox.classList.remove('visible');
-                familyInput.removeAttribute('required');
-                familyInput.value = '';
-            }
-        }
-    });
-});
-syncRadioStyles();
-
-// ОТПРАВКА ФОРМЫ В FORMSPREE
-const rsvpForm = document.getElementById('rsvpForm');
-if (rsvpForm) {
-    rsvpForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const form = this;
-        const submitBtn = document.getElementById('submitBtn');
-        const successBox = document.getElementById('successBox');
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = 'Отправка...';
-
-        fetch('https://formspree.io/f/meedpbyy', {
-            method: 'POST',
-            body: new FormData(form),
-            headers: { 'Accept': 'application/json' }
-        })
-        .then(response => {
-            if (response.ok) {
-                form.style.display = 'none';
-                successBox.style.display = 'block';
-            } else {
-                alert('Произошла ошибка отправки.');
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'Отправить ответ';
-            }
-        })
-        .catch(() => {
-            alert('Ошибка сети.');
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Отправить ответ';
-        });
-    });
-}
-</script>
-
-</body>
-</html>
