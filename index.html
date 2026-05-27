@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -96,33 +97,31 @@ position: relative;
 z-index: 1;
 }
 
-/* СТАБИЛЬНАЯ И БЕЗОПАСНАЯ АНИМАЦИЯ С КЛАССАМИ ВИДИМОСТИ */
+/* ЭТАЛОННАЯ ПЛАВНАЯ АНИМАЦИЯ КАРТОЧЕК И ВНУТРЕННИХ БЛОКОВ */
 .card {
+opacity: 0;
+transform: translateY(30px);
+will-change: transform, opacity;
+transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.card .anim-fade-up {
 opacity: 0;
 transform: translateY(20px);
 will-change: transform, opacity;
-transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+transition-delay: 0.1s;
 }
 
-/* Первые две карточки видны сразу, чтобы не было пустых экранов */
-.card.initial-visible {
-opacity: 1 !important;
-transform: translateY(0) !important;
-}
-
+/* Состояние видимости */
 .card.is-visible {
 opacity: 1 !important;
 transform: translateY(0) !important;
 }
 
-/* Внутренние элементы больше НЕ скрываются принудительно через opacity 0, они анимируются мягко */
-.anim-fade-up {
-animation: softFadeIn 0.8s ease-in-out forwards;
-}
-
-@keyframes softFadeIn {
-0% { opacity: 0.4; transform: scale(0.98); }
-100% { opacity: 1; transform: scale(1); }
+.card.is-visible .anim-fade-up {
+opacity: 1 !important;
+transform: translateY(0) !important;
 }
 
 .card {
@@ -375,61 +374,6 @@ color: #1d1d1f;
 text-align: center;
 }
 
-/* СТИЛИЗАЦИЯ БЛОКА ОБРАТНОГО ОТСЧЕТА */
-.countdown-box {
-margin: 14px 0 20px 0;
-min-height: 62px; /* Фиксирует высоту, чтобы верстка не прыгала */
-display: flex;
-justify-content: center;
-align-items: center;
-}
-
-.countdown-container {
-display: flex;
-justify-content: center;
-gap: 16px;
-}
-
-.countdown-item {
-display: flex;
-flex-direction: column;
-align-items: center;
-min-width: 60px;
-}
-
-.countdown-number {
-font-size: 1.5rem;
-font-weight: 700;
-color: #58111A;
-background: #f5f5f7;
-padding: 8px 12px;
-border-radius: 12px;
-width: 100%;
-text-align: center;
-box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
-}
-
-.countdown-label {
-font-size: 0.7rem;
-font-weight: 500;
-color: #86868b;
-margin-top: 6px;
-text-transform: uppercase;
-letter-spacing: 0.5px;
-}
-
-.wedding-day-message {
-font-size: 1.15rem;
-font-weight: 600;
-color: #58111A;
-padding: 12px 20px;
-background: #fdf5f6;
-border-radius: 14px;
-display: inline-block;
-text-align: center;
-box-shadow: 0 4px 15px rgba(88, 17, 26, 0.05);
-}
-
 .success-message {
 display: none;
 background: #f4fbf7;
@@ -453,14 +397,14 @@ margin-top: 15px;
 
 <div class="wrapper">
 
-<div class="card initial-visible js-observer-target">
+<div class="card js-observer-target">
 <p class="status">Мы меняем статус</p>
 <h1>Никита & Анастасия</h1>
 <p>Совсем скоро состоится одно из самых важных и счастливых событий в нашей жизни — наша свадьба. Мы хотим разделить этот особенный день с самыми близкими, поэтому с огромной радостью приглашаем вас на наш праздник!</p>
 <div class="date">19 сентября 2026</div>
 </div>
 
-<div class="card initial-visible js-observer-target">
+<div class="card js-observer-target">
 <h1>Где и когда</h1>
 <p>Ждем вас <strong>19 сентября 2026 года в 14:00</strong> на сбор гостей и торжественную церемонию.</p>
 
@@ -541,23 +485,7 @@ margin-top: 15px;
 </div>
 
 <div class="final-text">
-<span id="countdownTitle">До встречи на нашей свадьбе через:</span>
-<div class="countdown-box" id="countdownBox">
-<div class="countdown-container">
-<div class="countdown-item">
-<div class="countdown-number" id="days">00</div>
-<div class="countdown-label" id="daysLabel">Дней</div>
-</div>
-<div class="countdown-item">
-<div class="countdown-number" id="hours">00</div>
-<div class="countdown-label" id="hoursLabel">Часов</div>
-</div>
-<div class="countdown-item">
-<div class="countdown-number" id="minutes">00</div>
-<div class="countdown-label" id="minutesLabel">Минут</div>
-</div>
-</div>
-</div>
+До встречи на нашей свадьбе!<br>
 <span style="display: block; font-size: 0.95rem; font-weight: 600; color: #58111A; margin-top: 10px;">Никита и Анастасия</span>
 </div>
 </div>
@@ -565,54 +493,6 @@ margin-top: 15px;
 </div>
 
 <script>
-function getNounDeclension(number, one, two, five) {
-let n = Math.abs(number);
-n %= 100;
-if (n >= 5 && n <= 20) return five;
-n %= 10;
-if (n === 1) return one;
-if (n >= 2 && n <= 4) return two;
-return five;
-}
-
-function updateCountdown() {
-const stopDate = new Date('September 19, 2026 12:00:00').getTime();
-const now = new Date().getTime();
-const difference = stopDate - now;
-
-const titleEl = document.getElementById('countdownTitle');
-const boxEl = document.getElementById('countdownBox');
-
-// Жёсткая проверка: если разница меньше нуля — скрываем надпись и выводим плашку
-if (difference <= 0) {
-if (titleEl) titleEl.style.display = 'none';
-if (boxEl) boxEl.innerHTML = '<div class="wedding-day-message">Этот долгожданный день настал! 🎉</div>';
-return;
-}
-
-const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-
-const dEl = document.getElementById('days');
-const hEl = document.getElementById('hours');
-const mEl = document.getElementById('minutes');
-
-if (dEl && hEl && mEl) {
-dEl.innerText = days < 10 ? '0' + days : days;
-hEl.innerText = hours < 10 ? '0' + hours : hours;
-mEl.innerText = minutes < 10 ? '0' + minutes : minutes;
-
-document.getElementById('daysLabel').innerText = getNounDeclension(days, 'День', 'Дня', 'Дней');
-document.getElementById('hoursLabel').innerText = getNounDeclension(hours, 'Час', 'Часа', 'Часов');
-document.getElementById('minutesLabel').innerText = getNounDeclension(minutes, 'Минута', 'Минуты', 'Минут');
-}
-}
-
-// Первичный вызов и интервал
-updateCountdown();
-setInterval(updateCountdown, 60000);
-
 // Скелетон картинки ЗАГСа
 const weddingImg = document.getElementById('weddingImg');
 const imgWrapper = document.getElementById('imgWrapper');
@@ -625,7 +505,7 @@ if (weddingImg.complete) { handleImageLoaded(); }
 else { weddingImg.addEventListener('load', handleImageLoaded); }
 }
 
-// Параллакс
+// Параллакс фона
 const blurWine = document.getElementById('blurWine');
 const blurBlue = document.getElementById('blurBlue');
 window.addEventListener('scroll', () => {
@@ -634,16 +514,12 @@ if (blurWine) blurWine.style.transform = `translateY(${scrolled * 0.15}px)`;
 if (blurBlue) blurBlue.style.transform = `translateY(${scrolled * -0.1}px)`;
 });
 
-// Безопасный Intersection Observer для карточек
+// Стабильный Intersection Observer для плавного появления карточек и их содержимого
 const observerTargets = document.querySelectorAll('.js-observer-target');
-const observerOptions = { root: null, rootMargin: '0px 0px -4% 0px', threshold: 0.05 };
+const observerOptions = { root: null, rootMargin: '0px 0px -8% 0px', threshold: 0.05 };
 
 const observer = new IntersectionObserver((entries) => {
 entries.forEach(entry => {
-if (entry.target.classList.contains('initial-visible')) {
-entry.target.classList.add('is-visible');
-return;
-}
 if (entry.isIntersecting) { 
 entry.target.classList.add('is-visible'); 
 }
@@ -703,4 +579,3 @@ submitBtn.innerText = 'Отправить ответ';
 
 </body>
 </html>
-
