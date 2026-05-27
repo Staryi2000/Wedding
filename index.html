@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -108,7 +109,7 @@ position: relative;
 z-index: 1;
 }
 
-/* БАЗОВЫЕ СТИЛИ ДЛЯ АНИМАЦИИ С КОРРЕКТНЫМ WILL-CHANGE ДЛЯ IOS */
+/* БАЗОВЫЕ СТИЛИ ДЛЯ АНИМАЦИИ С КОРРЕКТНЫМ WILL-CHANGE И НОВОЙ СТРАТЕГИЕЙ ЗАГРУЗКИ */
 .card, .anim-fade-up {
 opacity: 0;
 transform: translateY(30px) scale(0.98);
@@ -116,9 +117,27 @@ will-change: transform, opacity;
 transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease;
 }
 
+/* Эффект интерактивного скролла для всех блоков */
 .is-visible {
 opacity: 1 !important;
 transform: translateY(0) scale(1) !important;
+}
+
+/* Анимация при стартовой загрузке: только для первых блоков */
+.initial-load {
+animation: startFadeUp 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+opacity: 1; /* Предотвращает мигание перед стартом */
+}
+
+@keyframes startFadeUp {
+0% {
+opacity: 0;
+transform: translateY(30px) scale(0.98);
+}
+100% {
+opacity: 1;
+transform: translateY(0) scale(1);
+}
 }
 
 .card {
@@ -543,7 +562,7 @@ blurWine.style.transform = `translateY(${scrolled * 0.15}px)`;
 blurBlue.style.transform = `translateY(${scrolled * -0.1}px)`;
 });
 
-// 2. ИСПРАВЛЕННЫЙ INTERSECTION OBSERVER С ЗАЩИТОЙ ОТ ТРЯСКИ НА IOS
+// 2. ИСПРАВЛЕННЫЙ INTERSECTION OBSERVER С ЗАЩИТОЙ ОТ ТРЯСКИ НА IOS И ПОДДЕРЖКОЙ СТАРТОВОЙ АНИМАЦИИ
 const observerTargets = document.querySelectorAll('.js-observer-target');
 const observerOptions = {
 root: null,
@@ -554,6 +573,9 @@ threshold: 0.01
 
 const observer = new IntersectionObserver((entries) => {
 entries.forEach(entry => {
+// Если блок — это первые два, мы отключаем для них скролл-анимацию на время загрузки
+if (entry.target.classList.contains('initial-load')) return;
+
 if (entry.isIntersecting) {
 entry.target.classList.add('is-visible');
 } else {
@@ -564,6 +586,19 @@ entry.target.classList.remove('is-visible'); // Сохранено скрыти�
 
 observerTargets.forEach(target => {
 observer.observe(target);
+});
+
+// Новая логика стартового появления
+window.addEventListener('DOMContentLoaded', () => {
+const firstTwoCards = document.querySelectorAll('.js-observer-target:nth-child(-n+2)'); // Выбираем первые две карточки
+firstTwoCards.forEach(card => {
+card.classList.add('initial-load'); // Применяем CSS-анимацию
+// После завершения анимации (через 0.9с) разрешаем InterscetionObserver управлять ими
+setTimeout(() => {
+card.classList.remove('initial-load'); 
+card.classList.add('is-visible'); // Фиксируем видимость
+}, 910);
+});
 });
 
 // 3. ПОЛЕ ДЛЯ СЕМЬИ С УЛУЧШЕННОЙ ВЫБОРКОЙ И ПЛАВНОЙ АНИМАЦИЕЙ
