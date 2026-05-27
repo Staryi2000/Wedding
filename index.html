@@ -559,7 +559,6 @@
         const partC = "QISocvJkccIRZVqqINipjVg8";
         const BOT_TOKEN = `${partA}:${partB}${partC}`;
 
-        // Твой сгенерированный токен API PuzzleBot
         const PUZZLE_API_KEY = 'RWGTpG1eVu9N1RxC5SKhMpLhLxR2euOg'; 
         const MY_CHAT_ID = '295188393'; 
 
@@ -568,7 +567,7 @@
             textMessage += ` (${currentCount} чел.)`;
         }
         
-        // 1. Прямая отправка уведомления в Telegram (Работает стабильно)
+        // 1. Уведомление напрямую в твой Telegram (работает железно)
         fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -579,15 +578,12 @@
             })
         });
 
-        // 2. Отправка в PuzzleBot с жесткой привязкой к твоему ID администратора
-        let variablesData = {};
-        if (attend === 'Да') {
-            variablesData['will_attend'] = `\n• ${name} (${currentCount} чел.)`;
-        } else {
-            variablesData['will_not_attend'] = `\n• ${name}`;
-        }
+        // 2. Поочередное добавление записей в переменные PuzzleBot через метод текста
+        let targetVariable = (attend === 'Да') ? 'will_attend' : 'will_not_attend';
+        let textToAdd = `\n• ${name}` + (attend === 'Да' ? ` (${currentCount} чел.)` : '');
 
-        fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
+        // Сначала записываем имя в нужный список (Придут / Не придут)
+        fetch(`https://api.puzzlebot.top/api/webhook/variable/add_text`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -596,9 +592,26 @@
             body: JSON.stringify({
                 bot_token: BOT_TOKEN,
                 user_id: MY_CHAT_ID, 
-                variables: variablesData,
-                expression: `total_count = total_count + ${currentCount}`
+                variable: targetVariable,
+                text: textToAdd
             })
+        })
+        .then(() => {
+            // Если гость придет, обновляем общий счетчик гостей отдельным запросом математики
+            if (attend === 'Да' && currentCount > 0) {
+                fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${PUZZLE_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        bot_token: BOT_TOKEN,
+                        user_id: MY_CHAT_ID,
+                        expression: `total_count = total_count + ${currentCount}`
+                    })
+                });
+            }
         })
         .then(() => {
             alert('Спасибо! Ваш ответ успешно отправлен.');
@@ -606,12 +619,12 @@
             if (familyCountBox) familyCountBox.classList.remove('visible');
         })
         .catch(err => {
-            // В случае любой задержки сети гость все равно увидит успешное окно
             alert('Спасибо! Ваш ответ успешно отправлен.');
             document.getElementById('rsvpForm').reset();
             if (familyCountBox) familyCountBox.classList.remove('visible');
         });
     });
+
 </script>
 
 </body>
