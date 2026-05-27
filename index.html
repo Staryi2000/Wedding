@@ -556,7 +556,7 @@
         });
     });
 
-    // 4. ОТПРАВКА ДАННЫХ В TELEGRAM
+    //     // ОТПРАВКА ДАННЫХ В PUZZLEBOT И ТЕЛЕГРАМ
     document.getElementById('rsvpForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -565,32 +565,64 @@
         const guests = document.querySelector('input[name="guests"]:checked').value;
         const familyCount = document.getElementById('familyCount').value;
         
-        let compositionText = guests;
-        if (guests === 'Семьей' && familyCount) {
-            compositionText = `Семьей (${familyCount} чел.)`;
+        let currentCount = 1;
+        if (attend === 'Да') {
+            if (guests === 'Со спутником') currentCount = 2;
+            if (guests === 'Семьей') currentCount = parseInt(familyCount || 2);
+        } else {
+            currentCount = 0;
+        }
+
+        const PUZZLE_API_KEY = '3718cba6615200171f5dbf57f44ccf24574831688fa83a6501';
+        const BOT_TOKEN = '8779823003:AAEGH2d1hUHrswy-1tD59wDpHeldB0iF4Tg';
+        const MY_CHAT_ID = '295188393';
+
+        // 1. Формируем красивый текст сообщения для логов и ЛС
+        let textMessage = `🔔 *Ответ RSVP!*\n\n👤 *Имя:* ${name}\n❓ *Присутствие:* ${attend}\n👥 *Состав:* ${guests}`;
+        if (attend === 'Да') {
+            textMessage += ` (${currentCount} чел.)`;
         }
         
-        const text = `🔔 Новый ответ RSVP!\n\n👤 Имя: ${name}\n❓ Присутствие: ${attend}\n👥 Состав: ${compositionText}`;
-        
-        const TELEGRAM_BOT_TOKEN = 'СЮДА_ВСТАВИТЬ_ТОКЕН_БОТА';
-        const TELEGRAM_CHAT_ID = 'СЮДА_ВСТАВИТЬ_ТВОЙ_ID';
-        
-        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-        
-        fetch(url, {
+        // Отправляем мгновенное уведомление тебе в чат с ботом
+        fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: text })
+            body: JSON.stringify({ 
+                chat_id: MY_CHAT_ID, 
+                text: textMessage,
+                parse_mode: 'Markdown'
+            })
+        });
+
+        // 4. Отправляем команду на обновление переменных в базу данных PuzzleBot
+        fetch(`https://api.puzzlebot.top/api/webhook/variable/change`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${PUZZLE_API_KEY}`
+            },
+            body: JSON.stringify({
+                bot_token: BOT_TOKEN,
+                chat_id: MY_CHAT_ID,
+                variables: {
+                    will_attend: attend === 'Да' ? `\n• ${name} (${guests === 'Один' ? '1 чел.' : guests === 'Со спутником' ? '2 чел.' : familyCount + ' чел.'})` : '',
+                    will_not_attend: attend === 'Нет' ? `\n• ${name}` : '',
+                },
+                expression: `total_count = total_count + ${currentCount}`
+            })
         })
         .then(response => {
-            alert('Спасибо! Ваш ответ успешно отправлен.');
+            alert('Спасибо! Ваш ответ успешно сохранен.');
             document.getElementById('rsvpForm').reset();
-            familyCountBox.classList.remove('visible');
+            const familyCountBox = document.getElementById('familyCountBox');
+            if (familyCountBox) familyCountBox.classList.remove('visible');
         })
         .catch(error => {
-            alert('Произошла ошибка при отправке.');
+            alert('Произошла ошибка при сохранении.');
         });
     });
+</script>
+
 </script>
 
 </body>
